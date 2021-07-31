@@ -3,10 +3,12 @@ import simplejson as json
 from flask import Flask, request, Response, redirect
 from flask import render_template
 from flaskext.mysql import MySQL
+from flask_login import LoginManager
 from pymysql.cursors import DictCursor
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
+login_manager = LoginManager()
 
 
 app.config['MYSQL_DATABASE_USER'] = 'root'
