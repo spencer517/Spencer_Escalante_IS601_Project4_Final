@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="/edit/{{patient.id}}" method="post">
+
+    <div class="row">
+        <div class="col">
+            <label for="fldIndex">Patient Number</label>
+            <input id="fldIndex" type="number" class="form-control" name="fldIndex" value="{{patient.fldIndex}}">
+        </div>
+        <div class="col">
+            <label for="fldHeight_Inches">Height(in)</label>
+            <input id="fldHeight_Inches" type="number" class="form-control" name="fldHeight_Inches" value="{{patient.fldHeight_Inches}}">
+        </div>
+        <div class="col">
+            <label for="fldWeight_Pounds">Weight(lbs)</label>
+            <input id="fldWeight_Pounds" type="number" class="form-control" name="fldWeight_Pounds" value="{{patient.fldWeight_Pounds}}">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Save</button>
+
+</form>
+{% endblock %}

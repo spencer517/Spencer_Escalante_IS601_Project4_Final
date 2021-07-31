@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+{% block content %}
+<form action="/patients/new" method="POST">
+
+    <div class="row">
+        <div class="col">
+            <label for="fldIndex">Patient Number</label>
+            <input id="fldIndex" type="text" class="form-control" name="fldIndex" placeholder="Patient Number">
+        </div>
+        <div class="col">
+            <label for="fldHeight_Inches">Height(in)</label>
+            <input id="fldHeight_Inches" type="text" class="form-control" name="fldHeight_Inches" placeholder="Patient Height">
+        </div>
+        <div class="col">
+            <label for="fldWeight_Pounds">Weight(lbs)</label>
+            <input id="fldWeight_Pounds" type="text" class="form-control" name="fldWeight_Pounds" placeholder="Patient Weight">
+        </div>
+    </div>
+
+    <button type="submit" class="btn btn-success">Add New Patient</button>
+
+</form>
+{% endblock %}
