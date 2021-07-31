@@ -209,3 +209,12 @@ INSERT INTO tableHeightWeight (fldIndex, fldHeight_Inches, fldWeight_Pounds) VAL
     (198, 68.24, 128.30),
     (199, 68.02, 127.47),
     (200, 71.39, 127.88 );
+CREATE TABLE IF NOT EXISTS users (
+    `id` int AUTO_INCREMENT,
+    `email` varchar(100),
+    `password` varchar(50),
+    PRIMARY KEY (`id`)
+);
+INSERT INTO users (email, password) VALUES
+    ('s.sescalante@gmail.com','password'),
+    ('t.thompson@gmail.com', 'password2');

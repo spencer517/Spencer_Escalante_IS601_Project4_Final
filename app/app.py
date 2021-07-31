@@ -1,6 +1,6 @@
 from typing import List, Dict
 import simplejson as json
-from flask import Flask, request, Response, redirect
+from flask import Flask, request, Response, redirect, flash
 from flask import render_template
 from flaskext.mysql import MySQL
 from flask_login import LoginManager
@@ -10,7 +10,7 @@ app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
 login_manager = LoginManager()
 
-
+app.config['SECRET_KEY'] = 'GDtfDCFYjD'
 app.config['MYSQL_DATABASE_USER'] = 'root'
 app.config['MYSQL_DATABASE_PASSWORD'] = 'root'
 app.config['MYSQL_DATABASE_HOST'] = 'db'
@@ -71,6 +71,23 @@ def remove_patient(patient_id):
     mysql.get_db().commit()
     return redirect("/", code=302)
 
+@app.route('/patients/signup', methods=['GET'])
+def signup_patient():
+    return render_template('signup.html', title='Patient Signup')
+
+@app.route('/patients/signup', methods=['POST'])
+def signup_patient_insert():
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT * FROM tableHeightWeight WHERE id=1')
+    result = cursor.fetchall()
+    print(result)
+    if len(result) is 0:
+        flash('Signup Successful')
+        return redirect("/", code=302)
+    flash('Error there is already a user with that email please enter a new email.')
+    return render_template('signup.html', title='Patient Signup')
+
+#API Section:
 @app.route('/api/v1/heightWeight', methods=['GET'])
 def browseHeightsAndWeights() -> str:
     cursor = mysql.get_db().cursor()
