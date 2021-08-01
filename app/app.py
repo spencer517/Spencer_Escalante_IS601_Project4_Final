@@ -96,6 +96,21 @@ def signup_patient_insert():
     flash('Error there is already a user with that email please enter a new email.')
     return render_template('signup.html', title='Patient Signup')
 
+@app.route('/patients/login', methods=['GET'])
+def login_page_render():
+    return render_template('login.html', title='Patient Login')
+
+@app.route('/patients/login', methods=['POST'])
+def login_patient():
+    cursor = mysql.get_db().cursor()
+    cursor.execute('SELECT password FROM users WHERE email=%s', request.form.get('fldEmail'))
+    result = cursor.fetchall()
+    if result[0]['password'] == request.form.get('fldPassword'):
+        flash('Passwords Match')
+        return redirect("/", code=302)
+    flash('Either the password you entered')
+    return render_template('login.html', title='Patient Login')
+
 #API Section:
 @app.route('/api/v1/heightWeight', methods=['GET'])
 def browseHeightsAndWeights() -> str:

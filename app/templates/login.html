@@ -1,11 +1,11 @@
 {% extends "layout.html" %}
 {% block content %}
-<form action="/patients/signup" method="POST">
+<form action="/patients/login" method="POST">
 
     <div class="row">
         <div class="col">
             <label for="fldEmail">Email</label>
-            <input id="fldEmail" type="text" class="form-control" name="fldEmail" placeholder="Email">
+            <input id="fldEmail" type="text" class="form-control" name="fldEmail" placeholder="Please enter your email">
         </div>
         <div class="col">
             <label for="fldPassword">Password</label>
@@ -13,7 +13,7 @@
         </div>
     </div>
 
-    <button type="submit" class="btn btn-success">Signup</button>
+    <button type="submit" class="btn btn-success">Login</button>
 
     <body>
       {% for msg in get_flashed_messages() %}
