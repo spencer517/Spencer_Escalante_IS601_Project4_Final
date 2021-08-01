@@ -5,6 +5,8 @@ from flask import render_template
 from flaskext.mysql import MySQL
 from flask_login import LoginManager
 from pymysql.cursors import DictCursor
+from flask_login import UserMixin
+from werkzeug.security import generate_password_hash
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
@@ -78,10 +80,17 @@ def signup_patient():
 @app.route('/patients/signup', methods=['POST'])
 def signup_patient_insert():
     cursor = mysql.get_db().cursor()
-    cursor.execute('SELECT * FROM tableHeightWeight WHERE id=1')
+    cursor.execute('SELECT * FROM users WHERE email=%s', request.form.get('fldEmail'))
     result = cursor.fetchall()
-    print(result)
     if len(result) is 0:
+        pswd = generate_password_hash(
+            request.form.get('fldPassword'),
+            method='sha256'
+        )
+        data =(request.form.get('fldEmail'),pswd)
+        new_patient_signup = """INSERT into users (email, password) VALUES (%s,%s)"""
+        cursor.execute(new_patient_signup, data)
+        mysql.get_db().commit()
         flash('Signup Successful')
         return redirect("/", code=302)
     flash('Error there is already a user with that email please enter a new email.')

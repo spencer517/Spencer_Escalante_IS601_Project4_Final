@@ -212,7 +212,7 @@ INSERT INTO tableHeightWeight (fldIndex, fldHeight_Inches, fldWeight_Pounds) VAL
 CREATE TABLE IF NOT EXISTS users (
     `id` int AUTO_INCREMENT,
     `email` varchar(100),
-    `password` varchar(50),
+    `password` varchar(550),
     PRIMARY KEY (`id`)
 );
 INSERT INTO users (email, password) VALUES
