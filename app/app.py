@@ -3,14 +3,16 @@ import simplejson as json
 from flask import Flask, request, Response, redirect, flash
 from flask import render_template
 from flaskext.mysql import MySQL
-from flask_login import LoginManager
+from flask_login import LoginManager, login_user, login_required, logout_user
 from pymysql.cursors import DictCursor
 from flask_login import UserMixin
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
+from models import MyUser
 
 app = Flask(__name__)
 mysql = MySQL(cursorclass=DictCursor)
 login_manager = LoginManager()
+login_manager.init_app(app)
 
 app.config['SECRET_KEY'] = 'GDtfDCFYjD'
 app.config['MYSQL_DATABASE_USER'] = 'root'
@@ -37,6 +39,7 @@ def rec_view(patient_id):
     return render_template('view.html', title='Home', patient=result[0])
 
 @app.route('/edit/<int:patient_id>', methods=['GET'])
+@login_required
 def get_edit(patient_id):
     cursor = mysql.get_db().cursor()
     cursor.execute('SELECT * FROM tableHeightWeight WHERE id=%s', patient_id)
@@ -44,6 +47,7 @@ def get_edit(patient_id):
     return render_template('edit.html', title='Home', patient=result[0])
 
 @app.route('/edit/<int:patient_id>', methods=['POST'])
+@login_required
 def update_post(patient_id):
     cursor = mysql.get_db().cursor()
     data = (request.form.get('fldIndex'), request.form.get('fldHeight_Inches'), request.form.get('fldWeight_Pounds'), patient_id)
@@ -57,6 +61,7 @@ def new_patient():
     return render_template('newpatient.html', title='New Patient')
 
 @app.route('/patients/new', methods=['POST'])
+@login_required
 def new_patient_insert():
     cursor = mysql.get_db().cursor()
     data = (request.form.get('fldIndex'), request.form.get('fldHeight_Inches'), request.form.get('fldWeight_Pounds'))
@@ -66,6 +71,7 @@ def new_patient_insert():
     return redirect("/", code=302)
 
 @app.route('/delete/<int:patient_id>', methods=['POST'])
+@login_required
 def remove_patient(patient_id):
     cursor = mysql.get_db().cursor()
     delete_patient_query = """DELETE FROM tableHeightWeight WHERE id = %s """
@@ -103,13 +109,41 @@ def login_page_render():
 @app.route('/patients/login', methods=['POST'])
 def login_patient():
     cursor = mysql.get_db().cursor()
-    cursor.execute('SELECT password FROM users WHERE email=%s', request.form.get('fldEmail'))
+    cursor.execute('SELECT * FROM users WHERE email=%s', request.form.get('fldEmail'))
     result = cursor.fetchall()
-    if result[0]['password'] == request.form.get('fldPassword'):
-        flash('Passwords Match')
+    checked = check_password_hash(result[0]['password'], request.form.get('fldPassword'))
+    if checked:
+        user = MyUser(result[0]['id'],result[0]['email'],result[0]['password'])
+        login_user(user)
+        flash('Login Success')
         return redirect("/", code=302)
-    flash('Either the password you entered')
+    flash('Either the password you entered is wrong or there is no account with that email please try again.')
     return render_template('login.html', title='Patient Login')
+
+@login_manager.user_loader
+def loadUser(user_id):
+    if user_id is not None:
+        cursor = mysql.get_db().cursor()
+        cursor.execute('SELECT * FROM users WHERE id=%s', user_id)
+        result = cursor.fetchall()
+        if len(result) != 0:
+            user = MyUser(result[0]['id'], result[0]['email'], result[0]['password'])
+            return user
+        else:
+            return None
+    return None
+
+@login_manager.unauthorized_handler
+def please_login():
+    flash("Please login before continuing.")
+    return redirect("/patients/login", code=302)
+
+@app.route("/logout")
+@login_required
+def logout():
+    logout_user()
+    flash("Logout Successful")
+    return redirect("/", code=302)
 
 #API Section:
 @app.route('/api/v1/heightWeight', methods=['GET'])
