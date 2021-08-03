@@ -57,6 +57,7 @@ def update_post(patient_id):
     return redirect("/", code=302)
 
 @app.route('/patients/new', methods=['GET'])
+@login_required
 def new_patient():
     return render_template('newpatient.html', title='New Patient')
 
